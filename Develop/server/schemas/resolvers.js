@@ -35,9 +35,17 @@ const resolvers = {
         },
         saveBook: async (_, { bookData }, context) => {
             if (context.user) {
-                return await User.findByIdAndUpdate({ _id: context.user._id }, { $push: { savedBooks: bookData } }, { runValidators: true, new: true })
+                return await User.findOneAndUpdate({ _id: context.user._id }, { $push: { savedBooks: bookData } }, { runValidators: true, new: true }) // if its data always run validators otherwise they wont run 
             }
             throw AuthenticationError;
+        },
+        removeBook: async (_, { bookId }, context) => {
+            if (context.user) {
+                return await User.findByIdAndUpdate(context.user._id, {$pull: {savedBooks: {bookId}}}, {new: true}) /// pushing or pull id doesnt require validation on the id 
+            }
+            throw AuthenticationError
         }
     }
 }
+
+module.exports = resolvers 
